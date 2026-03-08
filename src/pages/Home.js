@@ -1,72 +1,135 @@
-import previewImage from "../assets/collection-preview.jpg.jpeg"
+import { useEffect, useState } from "react"
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore"
+import { db } from "../firebase/config"
 import { Link } from "react-router-dom"
-import useScrollReveal from "../hooks/useScrollReveal"
 
 function Home() {
-  useScrollReveal()
+
+  const [works, setWorks] = useState([])
+
+  useEffect(() => {
+
+    const fetchWorks = async () => {
+
+      const q = query(
+        collection(db, "works"),
+        orderBy("createdAt", "desc"),
+        limit(4)
+      )
+
+      const snapshot = await getDocs(q)
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+
+      setWorks(data)
+    }
+
+    fetchWorks()
+
+  }, [])
+
   return (
-    <main className="bg-gray-50">
+
+    <div>
 
       {/* HERO */}
-      <section className="reveal text-center px-10 py-20">
-        <h1 className="text-4xl md:text-5xl font-semibold text-gray-800">
-          Design with Character
+
+      <section className="px-12 pt-20 pb-24">
+
+        <h1 className="text-5xl font-semibold leading-tight max-w-3xl mb-6">
+          Fashion Design Portfolio
         </h1>
 
-        <p className="mt-6 max-w-2xl mx-auto text-gray-500 leading-relaxed">
-          A fashion design portfolio exploring silhouette, material, and
-          proportion with refined visual sensitivity.
+        <p className="text-gray-500 max-w-xl text-lg">
+          A curated selection of custom mockups and design collections
+          exploring modern silhouettes, textures, and visual identity.
         </p>
 
-        <div className="mt-8 flex justify-center gap-4">
+      </section>
+
+      {/* SELECTED WORKS */}
+
+      <section className="px-12 pb-24">
+
+        <div className="flex justify-between items-center mb-10">
+
+          <h2 className="text-2xl font-semibold">
+            Selected Works
+          </h2>
+
           <Link
             to="/works"
-            className="bg-gray-800 text-white px-6 py-2 rounded-md text-sm hover:bg-gray-700 transition"
+            className="text-sm text-gray-500 hover:text-black"
           >
-            View Portfolio
+            View All
           </Link>
+
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-10">
+
+          {works.map((work) => (
+
+            <Link
+              key={work.id}
+              to={`/works/${work.id}`}
+              className="group"
+            >
+
+              <div className="aspect-[4/5] overflow-hidden rounded-xl">
+
+                <img
+                  src={work.imageUrl}
+                  alt={work.title}
+                  className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                />
+
+              </div>
+
+              <p className="mt-3 text-sm">
+                {work.title}
+              </p>
+
+            </Link>
+
+          ))}
+
+        </div>
+
+      </section>
+
+      {/* ABOUT PREVIEW */}
+
+      <section className="px-12 pb-24">
+
+        <div className="max-w-xl">
+
+          <h2 className="text-2xl font-semibold mb-4">
+            About
+          </h2>
+
+          <p className="text-gray-600 leading-relaxed mb-6">
+            I am a 22-year-old fashion designer from Indonesia,
+            specializing in design development with a strong
+            emphasis on character, detail, and refined visual
+            quality.
+          </p>
 
           <Link
             to="/about"
-            className="bg-gray-200 px-6 py-2 rounded-md text-sm hover:bg-gray-300 transition"
+            className="text-sm underline"
           >
-            About Me
+            Read More
           </Link>
+
         </div>
+
       </section>
 
-       {/* IMAGE BOX */}
-      <section className="reveal px-10 pb-24">
-        <div className="bg-white rounded-3xl p-10 border border-gray-200 max-w-[1200px] mx-auto fade-in">
-
-          <Link to="/works" className="group block">
-            <div className="overflow-hidden rounded-2xl">
-              <img
-                src={previewImage}
-                alt="Collection Preview"
-                className="w-full h-auto object-cover hover-scale"
-              />
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* FEATURE BLOCK STYLE (adapted to works preview) */}
-      <section className="reveal px-10 pb-20">
-        <div className="bg-white rounded-2xl p-10 shadow-sm">
-  
-          <h2 className="text-2xl font-semibold mb-4">
-            Selected Work Preview
-          </h2>
-
-          <p className="text-gray-500 leading-relaxed max-w-xl">
-            A curated selection of fashion design projects including
-            sweatpants, tee, hoodie, and sweater explorations.
-          </p>
-        </div>
-      </section>
-
-    </main>
+    </div>
   )
 }
 

@@ -10,7 +10,10 @@ import Works from "./pages/Works"
 import WorkDetail from "./pages/WorkDetail"
 import Contact from "./pages/Contact"
 import Login from "./pages/admin/Login"
-import Dashboard from "./pages/admin/Dashboard"
+import AdminDashboard from "./pages/admin/AdminDashboard"
+import AdminWorks from "./pages/admin/AdminWorks"
+import AdminUpload from "./pages/admin/AdminUpload"
+import AdminEditWork from "./pages/admin/AdminEditWork"
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -31,17 +34,26 @@ function AnimatedRoutes() {
           <Route path="/works/:id" element={<WorkDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Login />} />
-          <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/works" element={<AdminWorks />} />
+          <Route path="/admin/upload" element={<AdminUpload />} />
+          <Route path="/admin/edit/:id" element={<AdminEditWork />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
   )
 }
 
-function App() {
+function Layout() {
+  const location = useLocation()
+  const isAdmin = location.pathname.startsWith("/admin")
+
   return (
-    <BrowserRouter>
+    <>
       <Toaster position="top-center" />
+      {isAdmin ? (
+        <AnimatedRoutes />
+      ) : (
         <div className="min-h-screen bg-gray-200 flex items-center justify-center p-6">
           
           <div className="w-full max-w-[1200px] bg-white rounded-3xl shadow-md flex flex-col overflow-hidden">
@@ -56,6 +68,15 @@ function App() {
 
           </div>
         </div>
+      )}
+    </>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Layout />
     </BrowserRouter>
   )
 }
